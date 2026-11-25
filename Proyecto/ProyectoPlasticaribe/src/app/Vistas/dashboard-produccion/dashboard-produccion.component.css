@@ -2,148 +2,71 @@
     text-align: center;
 }
 
-::ng-deep .p-chip {
-    margin-top: 2%;
-}
-
-/* Cada proceso tiene un color de la paleta (--grafica-N), el mismo de sus barras en las gráficas
-   (ver colorProceso en el .ts). Producción: chip relleno. Meta: chip con borde del mismo color. */
-::ng-deep .prd-extrusion .p-chip {
-    background-color: var(--grafica-1);
-    color: var(--grafica-1-texto);
-}
-
-::ng-deep .meta-extrusion .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-1);
-}
-
-::ng-deep i.title-extrusion {
-    color: var(--grafica-1);
-}
-
-::ng-deep .prd-impresion .p-chip {
-    background-color: var(--grafica-2);
-    color: var(--grafica-2-texto);
-}
-
-::ng-deep .meta-impresion .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-2);
-}
-
-::ng-deep i.title-impresion {
-    color: var(--grafica-2);
-}
-
-::ng-deep .prd-perforado .p-chip {
-    background-color: var(--grafica-3);
-    color: var(--grafica-3-texto);
-}
-
-::ng-deep .meta-perforado .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-3);
-}
-
-::ng-deep i.title-perforado {
-    color: var(--grafica-3);
-}
-
-::ng-deep .prd-corte .p-chip {
-    background-color: var(--grafica-4);
-    color: var(--grafica-4-texto);
-}
-
-::ng-deep .meta-corte .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-4);
-}
-
-::ng-deep i.title-corte {
-    color: var(--grafica-4);
-}
-
-::ng-deep .prd-sellado .p-chip {
-    background-color: var(--grafica-5);
-    color: var(--grafica-5-texto);
-}
-
-::ng-deep .meta-sellado .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-5);
-}
-
-::ng-deep i.title-sellado {
-    color: var(--grafica-5);
-}
-
-::ng-deep .prd-camisilla .p-chip {
-    background-color: var(--grafica-6);
-    color: var(--grafica-6-texto);
-}
-
-::ng-deep .meta-camisilla .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-6);
-}
-
-::ng-deep i.title-camisilla {
-    color: var(--grafica-6);
-}
-
-::ng-deep .prd-laminado .p-chip {
-    background-color: var(--grafica-7);
-    color: var(--grafica-7-texto);
-}
-
-::ng-deep .meta-laminado .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-7);
-}
-
-::ng-deep i.title-laminado {
-    color: var(--grafica-7);
-}
-
-::ng-deep .prd-doblado .p-chip {
-    background-color: var(--grafica-8);
-    color: var(--grafica-8-texto);
-}
-
-::ng-deep .meta-doblado .p-chip {
-    background-color: var(--surface-card);
-    color: var(--text-color);
-    box-shadow: inset 0 0 0 2px var(--grafica-8);
-}
-
-::ng-deep i.title-doblado {
-    color: var(--grafica-8);
-}
-
-/* Títulos de las tablas por proceso: texto del tema; el ícono lleva el color del proceso */
-::ng-deep .title-extrusion,
-::ng-deep .title-impresion,
-::ng-deep .title-perforado,
-::ng-deep .title-corte,
-::ng-deep .title-sellado,
-::ng-deep .title-camisilla,
-::ng-deep .title-laminado,
-::ng-deep .title-doblado {
-    color: var(--texto-fuerte);
-}
-
 /* Desperdicio en las tablas por máquina: rojo de "valores negativos" de la paleta
    (reemplaza el palevioletred de la clase global .textRed solo en esta vista) */
 .textRed {
     color: var(--texto-peligro);
+}
+
+/* ===== Acumulado del mes (panel izquierdo) ===== */
+
+/* Dos columnas mientras cada una tenga al menos 320px; una sola si el panel es más angosto */
+.grid-graficas-mes {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    gap: 1rem;
+    text-align: center;
+}
+
+/* min-width 0: el ancho del canvas de Chart.js no fija el de la columna, así la gráfica se redimensiona
+   en ambos sentidos al cambiar el tamaño de la ventana */
+.columna-grafica-mes {
+    min-width: 0;
+}
+
+/* Skeleton de una gráfica del mes: ocupa lo mismo que la gráfica (100px) más sus chips */
+.carga-grafica-mes {
+    padding: 0.25rem 0.5rem 0;
+}
+
+.columna-grafica-mes ::ng-deep p-chart > div {
+    position: relative;
+    width: 100%;
+    min-width: 0;
+}
+
+.titulo-grafica-mes {
+    margin: 0 0 0.25rem;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--texto-fuerte);
+}
+
+/* Chips bajo cada gráfica (mismo estilo que los totales de las tarjetas) */
+.resumen-mes {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.total-chip.total-positivo {
+    color: var(--texto-exito);
+    background-color: var(--fondo-exito);
+    border-color: transparent;
+}
+
+/* Proyección por debajo de la meta: advertencia (ámbar), para no confundirla con el desperdicio (rojo) */
+.total-chip.total-negativo {
+    color: var(--texto-advertencia);
+    background-color: var(--fondo-advertencia);
+    border-color: transparent;
+}
+
+.total-chip.total-sin-meta {
+    color: var(--text-color-secondary);
+    background-color: var(--fondo-sutil);
 }
 
 /* ===== Producción diaria por máquina: cuadrícula de tarjetas por proceso ===== */
@@ -168,6 +91,15 @@
     text-align: left;
 }
 
+/* Encabezado y tabla de cada tarjeta comparten las filas de la cuadrícula (subgrid): si los totales de
+   una tarjeta ocupan dos líneas, todas las de esa fila crecen igual y las tablas quedan alineadas */
+.grid-maquinas > .tarjeta-proceso {
+    display: grid;
+    grid-template-rows: subgrid;
+    grid-row: span 2;
+    row-gap: 0;
+}
+
 .tarjeta-proceso {
     display: flex;
     flex-direction: column;
@@ -183,6 +115,7 @@
     display: flex;
     flex-wrap: wrap;
     align-items: center;
+    align-content: flex-start;
     justify-content: space-between;
     gap: 0.5rem;
     padding: 0.6rem 0.75rem;
@@ -194,6 +127,105 @@
     margin: 0;
     font-size: 1rem;
     font-weight: 700;
+    color: var(--texto-fuerte);
+}
+
+/* ===== Cumplimiento de programación diaria (panel derecho) ===== */
+
+/* Fecha a la izquierda y horario del día a la derecha; margen superior para que la etiqueta flotante
+   "Día de producción" no quede pegada al título */
+.selector-dia {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem 0.75rem;
+    margin: 1.5rem 0 1rem;
+}
+
+.selector-dia-rango {
+    color: var(--text-color-secondary);
+    white-space: nowrap;
+}
+
+/* Mismo margen lateral que la sección "Producción diaria por máquina" (p-4) */
+.fila-1 {
+    padding-inline: 1.3rem;
+}
+
+/* El panel derecho se estira a la altura de las gráficas del mes: su contenido ocupa todo el alto
+   y las tarjetas de cumplimiento se reparten ese espacio en vez de dejar un hueco abajo */
+:host ::ng-deep .panel-cumplimiento .p-card-body,
+:host ::ng-deep .panel-cumplimiento .p-card-content {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    flex: 1;
+    min-height: 0;
+}
+
+:host ::ng-deep .panel-cumplimiento.p-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+}
+
+/* Máximo dos tarjetas por fila (8 procesos = 4 filas completas); una sola si el panel es angosto */
+.grid-cumplimiento {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(max(210px, calc(50% - 0.75rem)), 1fr));
+    /* Filas de hasta 160px: llenan el panel en pantallas anchas sin hacerlo más alto que las gráficas del mes;
+       si el panel izquierdo es más alto (pantallas medianas), el sobrante queda abajo y las tarjetas
+       no se deforman */
+    grid-auto-rows: minmax(auto, 160px);
+    align-content: start;
+    gap: 0.75rem;
+    text-align: left;
+}
+
+/* Título arriba; knob y datos centrados en el alto restante de la tarjeta */
+.grid-cumplimiento .tarjeta-cumplimiento-cuerpo {
+    flex: 1;
+    justify-content: center;
+    gap: 1.25rem;
+}
+
+.tarjeta-cumplimiento .valor-principal {
+    font-size: 1.2rem;
+}
+
+/* Separación entre los kg (grandes) y la meta, que quedaban casi pegados */
+.tarjeta-cumplimiento .valor-secundario {
+    font-size: 0.8rem;
+    margin-top: 0.3rem;
+}
+
+.tarjeta-cumplimiento {
+    padding: 0.6rem 0.75rem;
+    gap: 0.4rem;
+}
+
+.tarjeta-cumplimiento-titulo {
+    font-size: 0.95rem;
+}
+
+.tarjeta-cumplimiento-cuerpo {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.tarjeta-cumplimiento-datos {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.4rem;
+    min-width: 0;
+}
+
+.tarjeta-cumplimiento-datos .valor-secundario i {
+    font-size: 0.7rem;
 }
 
 .tarjeta-proceso-titulo i {
@@ -327,17 +359,15 @@
     box-shadow: 0 0 0 2px var(--surface-card), 0 0 0 4px var(--color-proceso);
 }
 
-::ng-deep .p-card {
+/* :host da más especificidad que los "::ng-deep .p-card { width: 90%; margin: auto }" de otras vistas,
+   que se filtran a toda la app y dejaban un hueco grande entre las tarjetas. La separación la da el
+   gutter de la fila (g-3). */
+:host ::ng-deep .p-card {
     align-items: center;
-    margin: auto;
-    width: 98%;
+    margin: 0;
+    width: 100%;
     height: 100%;
     padding: 1%;
     border-radius: 10px;
     box-shadow: 0px 10px 15px 4px rgba(0, 0, 0, 0.2);
-    /* margin-bottom: 5%; */
-}
-
-::ng-deep .p-chip .p-chip-text {
-    font-size: 13px;
 }

@@ -1,297 +1,176 @@
 <div class="fondo">
-    <div class="row g-2 fila-1" *ngIf="!cargando">
-        <!-- Acumulado de producción vs meta -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-7 col-xl-7 col-xxl-7 slide-in-blurred-top" id="">
+    <div class="row g-3 fila-1">
+        <!-- Acumulado de producción vs meta (mes actual), una gráfica por proceso en dos columnas -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-7 col-xl-7 col-xxl-7 slide-in-blurred-top">
             <p-card>
                 <h2 style="font-weight: 700; text-align: center;"
-                    [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-3"><i
+                    [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i
                         class="pi pi-bolt"></i> Acumulado de producción vs meta por procesos (Mes actual)</h2>
-                <p-divider></p-divider>
                 <div class="mb-4">
-                    <div class="row g-3" style="text-align: center;">
-                        <div class="col-md">
-                            <!--Extrusión-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataExtrusion"
-                                [options]="ComparativoOptionsExtrusion"></p-chart>
-                            <p-chip class="text-center"
-                                label="EXT: {{totalPercMonth('EXTRUSION')}}% ⚡️: {{totalKgMonth('EXTRUSION') | number : '1.0-0'}} 🚩: {{totalGoalMonth('EXTRUSION') | number : '1.0-0'}} 🎯: {{totalPercProcess('EXTRUSION') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('EXTRUSION') | number : '1.0-0'}} • {{porcTotalWasteMonth('EXTRUSION') | number : '1.0-0'}}%"></p-chip>
-                            <p-divider></p-divider>
-                            <!--Impresión-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataImpresion"
-                                [options]="ComparativoOptionsImpresion"></p-chart>
-                            <p-chip
-                                label="IMP: {{totalPercMonth('IMPRESION')}}% ⚡️: {{totalKgMonth('IMPRESION') | number : '1.0-0'}} 🚩: {{totalGoalMonth('IMPRESION') | number : '1.0-0'}} 🎯: {{totalPercProcess('IMPRESION') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('IMPRESION') | number : '1.0-0'}} • {{porcTotalWasteMonth('IMPRESION') | number : '1.0-0'}}%"></p-chip>
-                            <p-divider></p-divider>
-                            <!--Perforado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataPerforado"
-                                [options]="ComparativoOptionsPerforado"></p-chart>
-                            <p-chip class="mb-3"
-                                label="PERF: {{totalPercMonth('PERFORADO')}}% ⚡️: {{totalKgMonth('PERFORADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('PERFORADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('PERFORADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('PERFORADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('PERFORADO') | number : '1.0-0'}}%"></p-chip>
-                            <p-divider></p-divider>
-
-                            <!--*Laminado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataLaminado"
-                                [options]="ComparativoOptionsLaminado"></p-chart>
-                            <p-chip class="mb-3"
-                                label="LAM: {{totalPercMonth('LAMINADO')}}% ⚡️: {{totalKgMonth('LAMINADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('LAMINADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('LAMINADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('LAMINADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('LAMINADO') | number : '1.0-0'}}%"></p-chip>
-
+                    <!-- Cuadrícula CSS (no row/col-md de Bootstrap): con min-width 0 las gráficas se encogen y vuelven
+                         a dos columnas al agrandar la ventana; con col-md el canvas conservaba su ancho y quedaban apiladas -->
+                    <div class="grid-graficas-mes">
+                        <div class="columna-grafica-mes" *ngFor="let columna of columnasMes">
+                            <ng-container *ngFor="let proc of columna; let ultimo = last; trackBy: trackProceso">
+                                <h6 class="titulo-grafica-mes">
+                                    <i class="{{proc.icono}}" [style.color]="colorProceso(proc)"></i> {{proc.nombre}}
+                                </h6>
+                                <!-- Carga inicial: leyenda, barras y chips de relleno con el mismo alto -->
+                                <div *ngIf="cargandoMes; else graficaMes" class="carga-grafica-mes">
+                                    <p-skeleton width="9rem" height="0.75rem" styleClass="mx-auto"></p-skeleton>
+                                    <p-skeleton width="100%" height="4.25rem" styleClass="my-2"></p-skeleton>
+                                    <p-skeleton width="100%" height="0.75rem"></p-skeleton>
+                                    <div class="resumen-mes">
+                                        <p-skeleton width="8rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                        <p-skeleton width="3.5rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                        <p-skeleton width="7rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                        <p-skeleton width="5rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                    </div>
+                                </div>
+                                <ng-template #graficaMes>
+                                <p-chart type="bar" width="100%" height="100px" [data]="graficasMes[proc.area]?.data"
+                                    [options]="graficasMes[proc.area]?.options"></p-chart>
+                                <!-- Resumen del mes: producido / meta · cumplimiento · proyección al cierre · desperdicio.
+                                     Sin meta en el mes: solo producido, "Sin meta" y desperdicio -->
+                                <div class="resumen-mes">
+                                    <span class="total-chip" tooltipPosition="top"
+                                        [pTooltip]="tieneMetaMes(proc) ? 'Producido del mes / meta del mes' : 'Producido del mes'">
+                                        <b>{{mes(proc).produccion | number :'1.0-0'}}</b>
+                                        <ng-container *ngIf="tieneMetaMes(proc)"> / {{mes(proc).meta | number :'1.0-0'}}</ng-container>
+                                        Kg
+                                    </span>
+                                    <ng-container *ngIf="tieneMetaMes(proc); else sinMetaMes">
+                                        <span class="total-chip" pTooltip="Cumplimiento de la meta del mes" tooltipPosition="top">
+                                            🎯 <b>{{mes(proc).porcMeta | number :'1.0-0'}}%</b>
+                                        </span>
+                                        <span class="total-chip"
+                                            [ngClass]="mes(proc).proyeccion < 0 ? 'total-negativo' : 'total-positivo'"
+                                            pTooltip="Proyección al cierre del mes frente a la meta, al ritmo de producción actual"
+                                            tooltipPosition="top">
+                                            <i class="pi"
+                                                [ngClass]="mes(proc).proyeccion < 0 ? 'pi-arrow-down-right' : 'pi-arrow-up-right'"></i>
+                                            Proyección {{mes(proc).proyeccion > 0 ? '+' : ''}}{{mes(proc).proyeccion | number :'1.0-0'}}%
+                                        </span>
+                                    </ng-container>
+                                    <ng-template #sinMetaMes>
+                                        <span class="total-chip total-sin-meta"
+                                            pTooltip="Este proceso no tiene meta asignada en el mes" tooltipPosition="top">
+                                            <i class="pi pi-flag"></i> Sin meta
+                                        </span>
+                                    </ng-template>
+                                    <span class="total-chip total-desperdicio" pTooltip="Desperdicio del mes (Kg · %)"
+                                        tooltipPosition="top">
+                                        🗑️ {{mes(proc).desperdicio | number :'1.0-0'}} · {{mes(proc).porcDesperdicio | number :'1.0-0'}}%
+                                    </span>
+                                </div>
+                                </ng-template>
+                                <p-divider *ngIf="!ultimo"></p-divider>
+                            </ng-container>
                         </div>
-
-                        <div class="col-md">
-                            <!--Corte-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataEmpaque"
-                                [options]="ComparativoOptionsEmpaque"></p-chart>
-                            <p-chip class="mb-3"
-                                label="CORT: {{totalPercMonth('CORTE')}}% ⚡️: {{totalKgMonth('CORTE') | number : '1.0-0'}} 🚩: {{totalGoalMonth('CORTE') | number : '1.0-0'}} 🎯: {{totalPercProcess('CORTE') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('CORTE') | number : '1.0-0'}} • {{porcTotalWasteMonth('CORTE') | number : '1.0-0'}}% "></p-chip>
-                            <p-divider></p-divider>
-
-                            <!--Sellado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataSellado"
-                                [options]="ComparativoOptionsSellado"></p-chart>
-                            <p-chip class="mb-3"
-                                label="SELLA.: {{totalPercMonth('SELLADO')}}% ⚡️: {{totalKgMonth('SELLADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('SELLADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('SELLADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('SELLADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('SELLADO') | number : '1.0-0'}}%"></p-chip>
-                            <p-divider></p-divider>
-
-                            <!--Camisilla-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataCamisilla"
-                                [options]="ComparativoOptionsCamisilla"></p-chart>
-                            <p-chip
-                                label="CAM.: {{totalPercMonth('CAMISILLA')}}% ⚡️: {{totalKgMonth('CAMISILLA') | number : '1.0-0'}} 🚩: {{totalGoalMonth('CAMISILLA') | number : '1.0-0'}} 🎯: {{totalPercProcess('CAMISILLA') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('CAMISILLA') | number : '1.0-0'}} • {{porcTotalWasteMonth('CAMISILLA') | number : '1.0-0'}}%"></p-chip>
-                            <p-divider></p-divider>
-
-                            <!--*Doblado-->
-                            <p-chart type="bar" width="100%" height="100px" [data]="ComparativoDataDoblado"
-                                [options]="ComparativoOptionsDoblado"></p-chart>
-                            <p-chip
-                                label="DOBL.: {{totalPercMonth('DOBLADO')}}% ⚡️: {{totalKgMonth('DOBLADO') | number : '1.0-0'}} 🚩: {{totalGoalMonth('DOBLADO') | number : '1.0-0'}} 🎯: {{totalPercProcess('DOBLADO') | number : '1.0-0' }}% | 🗑️: {{totalWasteMonth('DOBLADO') | number : '1.0-0'}} • {{porcTotalWasteMonth('DOBLADO') | number : '1.0-0'}}%"></p-chip>                       
-                    </div>
                     </div>
                 </div>
             </p-card>
         </div>
 
-        <!-- Meta diaria por maquinas -->
-        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5 slide-in-blurred-top" id="">
-            <p-card>
+        <!-- Cumplimiento de programación diaria: una tarjeta por proceso (mismo estilo que las tablas por máquina) -->
+        <div class="col-xs-12 col-sm-12 col-md-6 col-lg-5 col-xl-5 col-xxl-5 slide-in-blurred-top">
+            <p-card styleClass="panel-cumplimiento">
                 <h2 style="font-weight: 700; text-align: center;"
                     [ngClass]="{'tituloRojo' : !modoSeleccionado, 'tituloClaro': modoSeleccionado }" class="mb-4"><i
                         class="pi pi-check-circle"></i> Cumplimiento de programación diaria </h2>
 
-                <div class="col-xs-12 col-sm-12 col-md-12 col-lg-12 col-xl-12 col-xxl-12 ">
+                <div class="selector-dia">
                     <span class="p-float-label">
-                        <p-calendar [(ngModel)]="dateSelected" inputId="date" (onSelect)="loadDataProduction()"
-                            [showIcon]="true"></p-calendar>
-                        <label for="date">Elige una fecha</label>
+                        <p-calendar [(ngModel)]="dateSelected" inputId="date" (onSelect)="alElegirFecha()"
+                            [showIcon]="true" dateFormat="dd/mm/yy"></p-calendar>
+                        <label for="date">Día de producción</label>
                     </span>
+                    <small class="selector-dia-rango">
+                        <i class="pi pi-clock"></i> {{rangoDiaProduccion}}
+                    </small>
                 </div>
 
-                <p-divider></p-divider>
-                <!--Fila 1-->
-                <div class="mb-4">
-                    <div class="row g-3" style="text-align: center;">
-
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-bolt"></i> Extrusión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageExt" [min]="0"
-                                [max]="maxExtrusion" valueTemplate="{value}%" [valueColor]="colorProceso('EXTRUSION')"></p-knob>
-                            <p-chip class="mr-2 prd-extrusion" label=": {{totalKgProcess('EXT') | number : '1.0-0'}}">
-                                <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-extrusion" label=": {{totalMetaProcess('EXT') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
+                <div class="grid-cumplimiento">
+                    <section *ngFor="let proc of procesos; trackBy: trackProceso"
+                        class="tarjeta-proceso tarjeta-cumplimiento proceso-{{proc.clase}}">
+                        <h6 class="tarjeta-proceso-titulo tarjeta-cumplimiento-titulo">
+                            <i class="{{proc.icono}}"></i> {{proc.nombre}}
+                        </h6>
+                        <!-- Carga inicial o cambio de día: anillo y datos de relleno -->
+                        <div *ngIf="cargandoDia" class="tarjeta-cumplimiento-cuerpo">
+                            <p-skeleton shape="circle" size="96px"></p-skeleton>
+                            <div class="tarjeta-cumplimiento-datos">
+                                <p-skeleton width="6rem" height="1.3rem"></p-skeleton>
+                                <p-skeleton width="4.5rem" height="0.8rem"></p-skeleton>
+                                <p-skeleton width="5rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                            </div>
                         </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Extrusión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageExt" [min]="0"
-                                [max]="wastePercentageExt < 10 ? 10 : wastePercentageExt" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('EXT') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
-                            </p-chip>
+                        <div *ngIf="!cargandoDia" class="tarjeta-cumplimiento-cuerpo">
+                            <p-knob [readonly]="true" [size]="96" [ngModel]="dia(proc).porcCumplimiento" [min]="0"
+                                [max]="maxCumplimiento(proc)" valueTemplate="{value}%"
+                                [valueColor]="colorProceso(proc)"
+                                pTooltip="Cumplimiento de la meta del día" tooltipPosition="top"></p-knob>
+                            <div class="tarjeta-cumplimiento-datos">
+                                <span pTooltip="Kg producidos / meta del día" tooltipPosition="top">
+                                    <span class="valor-principal">{{dia(proc).kg | number :'1.0-0'}} Kg</span>
+                                    <span class="valor-secundario"><i class="pi pi-flag"></i> Meta
+                                        {{dia(proc).meta | number :'1.0-0'}}</span>
+                                </span>
+                                <span class="total-chip total-desperdicio" pTooltip="Desperdicio del día (Kg · %)"
+                                    tooltipPosition="top">
+                                    🗑️ {{dia(proc).desperdicio | number :'1.0-0'}} · {{dia(proc).porcDesperdicio | number :'1.0-0'}}%
+                                </span>
+                            </div>
                         </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-palette"></i> Impresión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageImp" [min]="0"
-                                [max]="maxImpresion" valueTemplate="{value}%" [valueColor]="colorProceso('IMPRESION')"></p-knob>
-                            <p-chip class="mr-2 prd-impresion" label=": {{totalKgProcess('IMP') | number : '1.0-0'}}">
-                                <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-impresion" label=": {{totalMetaProcess('IMP') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Impresión</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageImp" [min]="0"
-                                [max]="totalPercentageImp < 10 ? 10 : totalPercentageImp" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('IMP') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
-                            </p-chip>
-                        </div>
-                    </div>
-                </div>
-                <p-divider></p-divider>
-                <!--Fila 2-->
-                <div class="mb-4">
-                    <div class="row g-3" style="text-align: center;">
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-ellipsis-v"></i> Perforado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentagePerf" [min]="0"
-                                [max]="maxPerforado" valueTemplate="{value}%" [valueColor]="colorProceso('PERFORADO')"></p-knob>
-                            <p-chip class="mr-2 prd-perforado" label=": {{totalKgProcess('PERF') | number : '1.0-0'}}">
-                                <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-perforado" label=": {{totalMetaProcess('PERF') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Perforado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentagePerf" [min]="0"
-                                [max]="wastePercentagePerf < 15 ? 15 : wastePercentagePerf" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('PERF') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
-                            </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-database"></i> Corte</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageEmp" [min]="0"
-                                [max]="maxCorte" valueTemplate="{value}%" [valueColor]="colorProceso('CORTE')"></p-knob>
-                            <p-chip class="mr-2 prd-corte" label=": {{totalKgProcess('EMP') | number : '1.0-0'}}"> <i
-                                    class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-corte" label=": {{totalMetaProcess('EMP') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Corte</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageEmp" [min]="0"
-                                [max]="wastePercentageEmp < 10 ? 10 : wastePercentageEmp" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('EMP') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
-                            </p-chip>
-                        </div>
-                    </div>
-                </div>
-                <p-divider></p-divider>
-                <!--Fila 3-->
-                <div class="mb-4">
-                    <div class="row g-3" style="text-align: center;">
-                        <div class="col-md">
-                            <h6 style="text-align: center;"><b><i class="pi pi-box"></i> Sellado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageSella" [min]="0"
-                                [max]="maxSellado" valueTemplate="{value}%" [valueColor]="colorProceso('SELLADO')"></p-knob>
-                            <p-chip class="mr-2 prd-sellado" label=": {{totalKgProcess('SELLA') | number : '1.0-0'}}">
-                                <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-sellado" label=": {{totalMetaProcess('SELLA') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Sellado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageSella" [min]="0"
-                                [max]="wastePercentageSella < 10 ? 10 : wastePercentageSella" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('SELLA') | number : '1.0-0'}}"> <i class="pi pi-trash"></i>
-                            </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6 style="text-align: center;"><b><i class="pi pi-bookmark"></i> Camisilla</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageCami" [min]="0"
-                                [max]="maxCamisilla" valueTemplate="{value}%" [valueColor]="colorProceso('CAMISILLA')"></p-knob>
-                            <p-chip class="mr-2 prd-camisilla"
-                                label=": {{totalKgProcess('CAMISILLA') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i>
-                            </p-chip>
-                            <p-chip class="meta-camisilla"
-                                label=": {{totalMetaProcess('CAMISILLA') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp Camisilla</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageCami" [min]="0"
-                                [max]="wastePercentageCami < 15 ? 15 : wastePercentageCami" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('CAMISILLA') | number : '1.0-0'}}"> <i
-                                    class="pi pi-trash"></i> </p-chip>
-                        </div>
-                    </div>
-                </div>
-                <p-divider></p-divider>
-                <!--Fila 4-->
-                <div class="mb-4">
-                    <div class="row g-3" style="text-align: center;">
-                        <div class="col-md">
-                            <h6 style="text-align: center;"><b><i class="pi pi-file"></i> Laminado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageLaminado" [min]="0"
-                                [max]="maxLaminado" valueTemplate="{value}%" [valueColor]="colorProceso('LAMINADO')"></p-knob>
-                            <p-chip class="mr-2 prd-laminado" label=": {{totalKgProcess('LAM') | number : '1.0-0'}}">
-                                <i class="pi pi-bolt"></i> </p-chip>
-                            <p-chip class="meta-laminado" label=": {{totalMetaProcess('LAM') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Laminado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageLaminado" [min]="0"
-                                [max]="wastePercentageLaminado < 10 ? 10 : wastePercentageLaminado" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('LAM') | number : '1.0-0'}}"> <i
-                                    class="pi pi-trash"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6 style="text-align: center;"><b><i class="pi pi-map"></i> Doblado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="totalPercentageDoblado" [min]="0"
-                                [max]="maxDoblado" valueTemplate="{value}%" [valueColor]="colorProceso('DOBLADO')"></p-knob>
-                            <p-chip class="mr-2 prd-doblado"
-                                label=": {{totalKgProcess('DBLD') | number : '1.0-0'}}"> <i class="pi pi-bolt"></i>
-                            </p-chip>
-                            <p-chip class="meta-doblado"
-                                label=": {{totalMetaProcess('DBLD') | number : '1.0-0'}}"> <i
-                                    class="pi pi-flag"></i> </p-chip>
-                        </div>
-                        <div class="col-md">
-                            <h6><b><i class="pi pi-slack"></i> Desp. Doblado</b></h6>
-                            <p-knob [readonly]="true" [size]="80" [(ngModel)]="wastePercentageDoblado" [min]="0"
-                                [max]="wastePercentageDoblado < 10 ? 10 : wastePercentageDoblado" valueTemplate="{value}%"
-                                [strokeWidth]="7" [valueColor]="colorDesperdicio"></p-knob>
-                            <p-chip label=": {{totalWaste('DBLD') | number : '1.0-0'}}"> <i
-                                    class="pi pi-trash"></i> </p-chip>
-                        </div>
-                    </div>
+                    </section>
                 </div>
             </p-card>
         </div>
     </div>
 
     <!--Produccion diaria por maquina -->
-    <div class="row g-2 fila-2" *ngIf="!cargando">
+    <div class="row g-2 fila-2">
         <div class="p-4 col-xl-12 col-lg-12 col-md-12 col-sm-12 col-xs-12 slide-in-top">
             <p-card>
                 <h2 style="font-weight: 700; text-align: center;" class="tituloRojo mb-3"><i
-                        class="pi pi-sliders-h"></i> Producción diaria por maquina</h2>
+                        class="pi pi-sliders-h"></i> Producción diaria por máquina</h2>
 
-                <!-- Una tarjeta por proceso, en el orden del flujo de planta (procesosMaquinas en el .ts) -->
+                <!-- Una tarjeta por proceso, en el orden del flujo de planta (procesos en el .ts) -->
                 <div class="grid-maquinas">
-                    <section *ngFor="let proc of procesosMaquinas" class="tarjeta-proceso proceso-{{proc.clase}}">
+                    <section *ngFor="let proc of procesos; trackBy: trackProceso" class="tarjeta-proceso proceso-{{proc.clase}}">
                         <!-- Encabezado: nombre del proceso y totales del día -->
                         <header class="tarjeta-proceso-encabezado">
-                            <h6 class="tarjeta-proceso-titulo title-{{proc.clase}}">
-                                <i class="{{proc.icono}} title-{{proc.clase}}"></i> {{proc.nombre}}
+                            <h6 class="tarjeta-proceso-titulo">
+                                <i class="{{proc.icono}}"></i> {{proc.nombre}}
                             </h6>
-                            <div class="tarjeta-proceso-totales">
+                            <div *ngIf="cargandoDia" class="tarjeta-proceso-totales">
+                                <p-skeleton width="7rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                <p-skeleton width="3.5rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                                <p-skeleton width="5.5rem" height="1.4rem" borderRadius="999px"></p-skeleton>
+                            </div>
+                            <div *ngIf="!cargandoDia" class="tarjeta-proceso-totales">
                                 <span class="total-chip" pTooltip="Kg producidos / meta del día" tooltipPosition="top">
-                                    <b>{{totalKgProcess(proc.codigo) | number :'1.0-0'}}</b>
-                                    / {{totalMetaProcess(proc.codigo) | number :'1.0-0'}} Kg
+                                    <b>{{dia(proc).kg | number :'1.0-0'}}</b>
+                                    / {{dia(proc).meta | number :'1.0-0'}} Kg
                                 </span>
                                 <span class="total-chip" pTooltip="Cumplimiento de la meta" tooltipPosition="top">
-                                    🎯 <b>{{totalPercentageForProcess(proc.codigo) | number :'1.0-0'}}%</b>
+                                    🎯 <b>{{dia(proc).porcCumplimiento | number :'1.0-0'}}%</b>
                                 </span>
                                 <span class="total-chip" pTooltip="Kg turno día · turno noche" tooltipPosition="top">
-                                    <i class="pi pi-sun"></i> {{totalKgDay(proc.codigo) | number :'1.0-0'}}
-                                    · <i class="pi pi-moon"></i> {{totalKgNight(proc.codigo) | number :'1.0-0'}}
+                                    <i class="pi pi-sun"></i> {{dia(proc).kgDia | number :'1.0-0'}}
+                                    · <i class="pi pi-moon"></i> {{dia(proc).kgNoche | number :'1.0-0'}}
                                 </span>
                                 <span class="total-chip total-desperdicio" pTooltip="Desperdicio del día (Kg · %)"
                                     tooltipPosition="top">
-                                    🗑️ {{totalWaste(proc.codigo) | number :'1.0-0'}}
-                                    · {{totalPorcWaste(proc.codigo) | number :'1.0-0'}}%
+                                    🗑️ {{dia(proc).desperdicio | number :'1.0-0'}}
+                                    · {{dia(proc).porcDesperdicio | number :'1.0-0'}}%
                                 </span>
                             </div>
                         </header>
 
-                        <p-table [rowHover]="true" styleClass="p-datatable-sm tabla-maquinas"
+                        <p-table [rowHover]="!cargandoDia" styleClass="p-datatable-sm tabla-maquinas"
                             [scrollable]="true" scrollHeight="300px"
-                            [value]="productionMachineProcess(proc.codigo)">
+                            [value]="cargandoDia ? filasCarga : dia(proc).maquinas">
                             <ng-template pTemplate="header">
                                 <tr>
                                     <th pSortableColumn="machine">Maq.</th>
@@ -303,17 +182,34 @@
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-data>
-                                <tr>
+                                <!-- Carga inicial o cambio de día: filas de relleno (filasCarga) -->
+                                <tr *ngIf="cargandoDia" class="fila-carga">
+                                    <td><p-skeleton width="1.2rem" height="1rem" styleClass="mx-auto"></p-skeleton></td>
+                                    <td><p-skeleton width="3rem" height="1rem" styleClass="mx-auto mb-1"></p-skeleton>
+                                        <p-skeleton width="3.5rem" height="0.65rem" styleClass="mx-auto"></p-skeleton></td>
+                                    <td><p-skeleton width="2.2rem" height="1rem" styleClass="mx-auto mb-1"></p-skeleton>
+                                        <p-skeleton width="3.5rem" height="0.35rem" styleClass="mx-auto"></p-skeleton></td>
+                                    <td><p-skeleton width="1.8rem" height="1rem" styleClass="mx-auto"></p-skeleton></td>
+                                    <td><p-skeleton width="3rem" height="1.6rem" styleClass="mx-auto"></p-skeleton></td>
+                                    <td class="col-ver"><p-skeleton shape="circle" size="1.75rem" styleClass="mx-auto"></p-skeleton></td>
+                                </tr>
+                                <tr *ngIf="!cargandoDia">
                                     <td><b>{{data.machine}}</b></td>
 
-                                    <!-- Kg producidos; la meta (debajo) se edita con clic -->
-                                    <td [pEditableColumn]="data.goal" pEditableColumnField="goal" class="cursor"
-                                        pTooltip="Clic para editar la meta" tooltipPosition="top">
+                                    <!-- Kg producidos; la meta (debajo) solo la edita el administrador (rol 1):
+                                         Enter o salir de la celda guarda, Escape descarta -->
+                                    <td [pEditableColumn]="data.goal" pEditableColumnField="goal"
+                                        [pEditableColumnDisabled]="!esAdministrador" [class.cursor]="esAdministrador"
+                                        pTooltip="Clic para editar la meta" tooltipPosition="top"
+                                        [tooltipDisabled]="!esAdministrador">
                                         <p-cellEditor>
                                             <ng-template pTemplate="input">
                                                 <p-inputNumber [(ngModel)]="data.goal" mode="decimal" locale="en-US"
-                                                    [minFractionDigits]="2" [required]="true" inputStyleClass="input-meta"
-                                                    (onKeyDown)="updateGoalForMachine(data, $event, proc.codigo)"></p-inputNumber>
+                                                    [minFractionDigits]="2" [min]="0" [required]="true"
+                                                    inputStyleClass="input-meta"
+                                                    (onFocus)="editandoMeta = true"
+                                                    (onKeyDown)="alTeclearMeta(data, $event, proc.codigo)"
+                                                    (onBlur)="guardarMeta(data, proc.codigo)"></p-inputNumber>
                                             </ng-template>
                                             <ng-template pTemplate="output">
                                                 <span class="valor-principal">{{data.weight | number :'1.0-0'}}</span>
@@ -375,7 +271,7 @@
 </div>
 
 <!--Modal de producción -->
-<p-dialog header="Reporte de producción" [(visible)]="productionReport" [modal]="true" [style]="{ width: '80vw' }"
+<p-dialog header="Reporte de producción" [(visible)]="productionReport" (onShow)="alMostrarReporteProduccion()" [modal]="true" [style]="{ width: '80vw' }"
     [draggable]="false" [resizable]="false">
     <app-Reporte-Produccion></app-Reporte-Produccion>
 </p-dialog>
