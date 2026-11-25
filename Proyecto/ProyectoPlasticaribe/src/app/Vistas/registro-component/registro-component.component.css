@@ -22,10 +22,35 @@
   z-index: 2;
 }
 
+/* Formularios de usuario, rol y área: separación vertical entre filas mayor que la de Bootstrap (g-4 = 1.5rem),
+   para que la etiqueta flotante, al subir, no quede pegada al campo de la fila de arriba */
+.formulario-modal {
+  --bs-gutter-y: 2.6rem; /* la etiqueta flotante ocupa ~1.25rem sobre el campo: quedan ~1.3rem libres */
+}
+
+/* Ícono de las descripciones (textarea): en la primera línea del texto, no centrado en todo el alto */
+.formulario-modal .p-input-icon-left:has(> textarea) > i {
+  top: 1.35rem;
+}
+
+/* Ícono del selector de vistas (p-treeSelect): el estilo global solo cubre input, dropdown, autocomplete, etc. */
+.formulario-modal .p-input-icon-left:has(> p-treeselect) > i {
+  z-index: 1;
+}
+
+:host ::ng-deep .formulario-modal .p-input-icon-left > p-treeselect .p-treeselect-label {
+  padding-left: 2.5rem;
+}
+
+.formulario-modal .p-input-icon-left > p-treeselect.p-inputwrapper-filled ~ label,
+.formulario-modal .p-input-icon-left > p-treeselect.p-inputwrapper-focus ~ label {
+  left: 0.75rem;
+}
+
 /* Barra de acciones con totalizador (mismo estilo que el "Total Stock" de Inventario de Productos Terminados, en verde).
-   El fondo usa --fondo-exito, que ya tiene su versión para modo oscuro. */
+   Colores de la paleta (--texto-exito / --fondo-exito), que ya tienen su versión para modo oscuro. */
 :host {
-  --verde-total: #16a34a;
+  --verde-total: var(--texto-exito);
 }
 
 .barraAcciones {
@@ -65,7 +90,7 @@
   height: 2.5rem;
   border-radius: 50%;
   background-color: var(--verde-total);
-  color: #ffffff;
+  color: var(--surface-card); /* contrasta con el verde en ambos temas (oscuro sobre el verde claro del modo oscuro) */
   font-size: 1.1rem;
 }
 
@@ -133,17 +158,36 @@
 }
 
 ::ng-deep .tooltip-total-usuarios .punto.activo {
-  background-color: #22c55e;
+  background-color: var(--texto-exito);
 }
 
 ::ng-deep .tooltip-total-usuarios .punto.inactivo {
-  background-color: #ef4444;
+  background-color: var(--texto-peligro);
 }
 
 /* Botones redondos de editar / inactivar en las filas */
 :host ::ng-deep .boton-fila {
   width: 30px;
   height: 30px;
+}
+
+/* Editar (lápiz): redondo, relleno con el azul de la marca (--azul-boton, igual en ambos temas) e ícono blanco.
+   El azul no se confunde con el rojo de inactivar ni con el verde de exportar/confirmar.
+   :host + dos clases le gana al .p-button del tema. El hover aclara el mismo azul (sin otro color). */
+:host ::ng-deep .p-button.boton-editar,
+:host ::ng-deep .p-button.boton-editar:enabled:hover,
+:host ::ng-deep .p-button.boton-editar:enabled:active {
+  background: var(--azul-boton);
+  border-color: var(--azul-boton);
+  color: #ffffff;
+}
+
+:host ::ng-deep .p-button.boton-editar:enabled:hover {
+  filter: brightness(1.25);
+}
+
+:host ::ng-deep .p-button.boton-editar:focus {
+  box-shadow: 0 0 0 2px var(--surface-card), 0 0 0 4px var(--azul-boton);
 }
 
 /* Columnas del checkbox y del estado centradas en ambos sentidos (PrimeNG alinea las celdas a la izquierda) */

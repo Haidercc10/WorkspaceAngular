@@ -27,7 +27,7 @@
       </ng-template>
 
       <div class="barraAcciones mb-3">
-        <button pButton pRipple data-tutorial="nuevoUsuario" label="Crear Usuario" icon="pi pi-plus" class="p-button-success" (click)="abrirCrearUsuario()"></button>
+        <button pButton pRipple data-tutorial="nuevoUsuario" label="Crear Usuario" icon="pi pi-plus" class="p-button-danger" (click)="abrirCrearUsuario()"></button>
         <button pButton pRipple data-tutorial="inactivarUsuarios" label="Inactivar seleccionados" icon="pi pi-ban" class="p-button-danger" [disabled]="!usuariosInactivar.length" (click)="confirmarInactivar(usuariosInactivar)"></button>
 
         <div class="resumenTotal empujarDerecha conDetalle" data-tutorial="totalUsuarios"
@@ -62,7 +62,7 @@
         <ng-template pTemplate="caption">
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" data-tutorial="buscarUsuarios" placeholder="Buscar usuarios..." (input)="aplicarfiltroGlobal($event, dt)" pTooltip="Busca usuarios por ID, cédula, nombre, área o rol" tooltipPosition="top"/>
+            <input pInputText type="text" data-tutorial="buscarUsuarios" placeholder="Buscar por ID, cédula, nombre, área o rol..." (input)="aplicarfiltroGlobal($event, dt)"/>
           </span>
         </ng-template>
         <ng-template pTemplate="header">
@@ -89,8 +89,8 @@
             <td><b>{{usuario.Area}}</b></td>
             <td>{{usuario.Rol}}</td>
             <td class="celda-centrada"><span class="badge" [ngClass]="usuario.Estado == 'ACTIVO' ? 'estado-activo' : 'estado-inactivo'">{{usuario.Estado}}</span></td>
-            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success boton-fila" pTooltip="Editar" tooltipPosition="left" (click)="abrirEditarUsuario(usuario)"></button></td>
-            <td class="text-center"><button pButton pRipple icon="pi pi-ban" class="p-button-rounded p-button-danger boton-fila" pTooltip="Inactivar" tooltipPosition="left" [disabled]="usuario.Estado == 'INACTIVO'" (click)="confirmarInactivar([usuario])"></button></td>
+            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded boton-fila boton-editar" (click)="abrirEditarUsuario(usuario)"></button></td>
+            <td class="text-center"><button pButton pRipple icon="pi pi-ban" class="p-button-rounded p-button-danger boton-fila" [disabled]="usuario.Estado == 'INACTIVO'" (click)="confirmarInactivar([usuario])"></button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -106,7 +106,7 @@
       </ng-template>
 
       <div class="barraAcciones mb-3">
-        <button pButton pRipple data-tutorial="nuevoRol" label="Crear Rol" icon="pi pi-plus" class="p-button-success" (click)="abrirCrearRol()"></button>
+        <button pButton pRipple data-tutorial="nuevoRol" label="Crear Rol" icon="pi pi-plus" class="p-button-danger" (click)="abrirCrearRol()"></button>
         <div class="resumenTotal empujarDerecha" data-tutorial="totalRoles">
           <span class="iconoTotal"><i class="pi pi-id-card"></i></span>
           <div class="datosTotal">
@@ -134,7 +134,7 @@
         <ng-template pTemplate="caption">
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Buscar roles..." (input)="aplicarfiltroGlobal($event, dt_Roles)"/>
+            <input pInputText type="text" placeholder="Buscar por ID, nombre o descripción..." (input)="aplicarfiltroGlobal($event, dt_Roles)"/>
           </span>
         </ng-template>
         <ng-template pTemplate="header">
@@ -150,7 +150,7 @@
             <td>{{rol.rolUsu_Id}}</td>
             <td><b>{{rol.rolUsu_Nombre}}</b></td>
             <td>{{rol.rolUsu_Descripcion}}</td>
-            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success boton-fila" pTooltip="Editar" tooltipPosition="left" (click)="abrirEditarRol(rol)"></button></td>
+            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded boton-fila boton-editar" (click)="abrirEditarRol(rol)"></button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -166,7 +166,7 @@
       </ng-template>
 
       <div class="barraAcciones mb-3">
-        <button pButton pRipple data-tutorial="nuevaArea" label="Crear Área" icon="pi pi-plus" class="p-button-success" (click)="abrirCrearArea()"></button>
+        <button pButton pRipple data-tutorial="nuevaArea" label="Crear Área" icon="pi pi-plus" class="p-button-danger" (click)="abrirCrearArea()"></button>
         <div class="resumenTotal empujarDerecha" data-tutorial="totalAreas">
           <span class="iconoTotal"><i class="pi pi-sitemap"></i></span>
           <div class="datosTotal">
@@ -194,7 +194,7 @@
         <ng-template pTemplate="caption">
           <span class="p-input-icon-left">
             <i class="pi pi-search"></i>
-            <input pInputText type="text" placeholder="Buscar áreas..." (input)="aplicarfiltroGlobal($event, dt_Areas)"/>
+            <input pInputText type="text" placeholder="Buscar por ID, nombre o descripción..." (input)="aplicarfiltroGlobal($event, dt_Areas)"/>
           </span>
         </ng-template>
         <ng-template pTemplate="header">
@@ -210,7 +210,7 @@
             <td>{{area.area_Id}}</td>
             <td><b>{{area.area_Nombre}}</b></td>
             <td>{{area.area_Descripcion}}</td>
-            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded p-button-success boton-fila" pTooltip="Editar" tooltipPosition="left" (click)="abrirEditarArea(area)"></button></td>
+            <td class="text-center"><button pButton pRipple icon="pi pi-pencil" class="p-button-rounded boton-fila boton-editar" (click)="abrirEditarArea(area)"></button></td>
           </tr>
         </ng-template>
         <ng-template pTemplate="emptymessage">
@@ -226,9 +226,12 @@
   <!-- autocomplete off / new-password: evita que el navegador rellene el ID y la contraseña con las credenciales
        guardadas de quien está registrando el usuario. -->
   <form [formGroup]="FormUsuarios" (ngSubmit)="guardarUsuario()" class="pt-3" autocomplete="off">
-    <div class="row g-4">
+    <!-- formulario-modal: más separación entre filas para que las etiquetas flotantes no queden pegadas al campo de arriba.
+         Íconos con el patrón global de styles.css (p-input-icon-left / p-dropdown-icon-left + p-float-label). -->
+    <div class="row g-4 formulario-modal">
       <div class="col-md-6">
-        <span class="p-float-label">
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-id-card"></i>
           <input formControlName="usuCedula" id="usuCedula" type="text" inputmode="numeric" [attr.maxlength]="limites.digitos" autocomplete="off" pInputText class="w-100" (input)="alEscribirCedula($event)"/>
           <label for="usuCedula">Cédula</label>
         </span>
@@ -237,61 +240,72 @@
       </div>
 
       <div class="col-md-6">
-        <span class="p-float-label">
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-hashtag"></i>
           <input formControlName="usuId" id="usuId" type="text" inputmode="numeric" [attr.maxlength]="limites.digitos" autocomplete="off" pInputText class="w-100" [readonly]="accion == 'Editar'" (input)="alEscribirId($event)"
                  pTooltip="Por defecto, los últimos 4 dígitos de la cédula. Puedes cambiarlo o borrarlo." tooltipPosition="top" [tooltipDisabled]="accion != 'Crear'"/>
           <label for="usuId">ID Usuario *</label>
         </span>
         <small class="p-error" *ngIf="errorNumero('usuId') as error">{{error}}</small>
-        <small class="p-error" *ngIf="!errorNumero('usuId') && idExistente as otro">Ya pertenece a {{otro.Nombre}}.</small>      </div>
+        <small class="p-error" *ngIf="!errorNumero('usuId') && idExistente as otro">Ya pertenece a {{otro.Nombre}}.</small>
+      </div>
 
       <div class="col-md-12">
-        <span class="p-float-label">
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-user"></i>
           <input formControlName="usuNombre" id="usuNombre" type="text" [attr.maxlength]="limites.nombre" autocomplete="off" pInputText appContadorCaracteres class="w-100 texto-mayusculas" (input)="nombreEnMayusculas($event)"/>
           <label for="usuNombre">Nombre Usuario *</label>
         </span>
       </div>
 
+      <!-- Tipo, área y rol en orden alfabético (copias ordenadas en el .ts; las tablas conservan su orden) -->
       <div class="col-md-6">
-        <span class="p-float-label">
-          <p-dropdown appendTo="body" formControlName="usuTipo" inputId="usuTipo" [options]="arrayTiposUsuarios" optionValue="tpUsu_Id" optionLabel="tpUsu_Nombre" [filter]="true" filterBy="tpUsu_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
+        <span class="p-float-label p-input-icon-left p-dropdown-icon-left">
+          <i class="pi pi-users"></i>
+          <p-dropdown appendTo="body" formControlName="usuTipo" inputId="usuTipo" [options]="tiposUsuarioOrdenados" optionValue="tpUsu_Id" optionLabel="tpUsu_Nombre" [filter]="true" filterBy="tpUsu_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
           <label for="usuTipo">Tipo Usuario *</label>
         </span>
       </div>
 
       <div class="col-md-6">
-        <span class="p-float-label">
-          <p-dropdown appendTo="body" formControlName="usuArea" inputId="usuArea" [options]="arrayAreas" optionValue="area_Id" optionLabel="area_Nombre" [filter]="true" filterBy="area_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
+        <span class="p-float-label p-input-icon-left p-dropdown-icon-left">
+          <i class="pi pi-sitemap"></i>
+          <p-dropdown appendTo="body" formControlName="usuArea" inputId="usuArea" [options]="areasOrdenadas" optionValue="area_Id" optionLabel="area_Nombre" [filter]="true" filterBy="area_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
           <label for="usuArea">Área *</label>
         </span>
       </div>
 
       <div class="col-md-6">
-        <span class="p-float-label">
-          <p-dropdown appendTo="body" formControlName="usuRol" inputId="usuRol" [options]="arrayRoles" optionValue="rolUsu_Id" optionLabel="rolUsu_Nombre" [filter]="true" filterBy="rolUsu_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
+        <span class="p-float-label p-input-icon-left p-dropdown-icon-left">
+          <i class="pi pi-shield"></i>
+          <p-dropdown appendTo="body" formControlName="usuRol" inputId="usuRol" [options]="rolesOrdenados" optionValue="rolUsu_Id" optionLabel="rolUsu_Nombre" [filter]="true" filterBy="rolUsu_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
           <label for="usuRol">Rol Usuario *</label>
         </span>
       </div>
 
       <div class="col-md-6">
-        <span class="p-float-label">
+        <span class="p-float-label p-input-icon-left p-dropdown-icon-left">
+          <i class="pi pi-check-circle"></i>
           <p-dropdown appendTo="body" formControlName="usuEstado" inputId="usuEstado" [options]="arrayEstados" optionValue="estado_Id" optionLabel="estado_Nombre" [autoDisplayFirst]="false" styleClass="w-100"></p-dropdown>
           <label for="usuEstado">Estado *</label>
         </span>
       </div>
 
+      <!-- Un solo control para ver la contraseña (el ojo de la derecha). El ojo propio de Edge (::-ms-reveal) se oculta en styles.css -->
       <div class="col-md-12">
-        <span class="p-float-label p-input-icon-right w-100">
-          <i class="pi boton-ver-password" [ngClass]="verPassword ? 'pi-eye-slash' : 'pi-eye'" (click)="verPassword = !verPassword" [pTooltip]="verPassword ? 'Ocultar' : 'Mostrar'" tooltipPosition="left"></i>
+        <span class="p-float-label p-input-icon-left p-input-icon-right w-100">
+          <i class="pi pi-lock"></i>
           <input formControlName="usuPassword" id="usuPassword" [type]="verPassword ? 'text' : 'password'" [attr.maxlength]="limites.password" autocomplete="new-password" pInputText class="w-100"/>
+          <i class="pi boton-ver-password" [ngClass]="verPassword ? 'pi-eye-slash' : 'pi-eye'" (click)="verPassword = !verPassword" [pTooltip]="verPassword ? 'Ocultar' : 'Mostrar'" tooltipPosition="left"></i>
           <label for="usuPassword">Contraseña *</label>
         </span>
         <small class="p-error" *ngIf="FormUsuarios.get('usuPassword')?.hasError('maxlength')">Máximo {{limites.password}} caracteres.</small>
       </div>
 
+      <!-- Acción principal en el rojo del logo y Cancelar en gris (mismo estándar que las confirmaciones) -->
       <div class="col-12 d-flex justify-content-end gap-2">
-        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary p-button-outlined" (click)="dialogUsuarios = false"></button>
-        <button pButton pRipple type="submit" label="{{accion}} Usuario" icon="pi pi-save" class="p-button-success"></button>
+        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="dialogUsuarios = false"></button>
+        <button pButton pRipple type="submit" label="{{accion}} Usuario" icon="pi pi-save" class="p-button-danger"></button>
       </div>
     </div>
   </form>
@@ -299,25 +313,28 @@
 
 <!-- ============================== MODAL ROL ============================== -->
 <p-dialog [(visible)]="modalRol" [contentStyle]="{'overflow':'visible'}" [style]="{width: '480px'}" [breakpoints]="{'576px': '95vw'}" header="{{editarRol ? 'Editar' : 'Crear'}} Rol" [modal]="true">
-  <form [formGroup]="formRoles" (ngSubmit)="guardarRol()" class="pt-3">
-    <div class="row g-4">
+  <form [formGroup]="formRoles" (ngSubmit)="guardarRol()" class="pt-3" autocomplete="off">
+    <div class="row g-4 formulario-modal">
       <div class="col-12">
-        <span class="p-float-label">
-          <input formControlName="rolNombre" id="rolNombre" type="text" pInputText class="w-100" [class.ng-dirty]="rolDuplicado" [class.ng-invalid]="rolDuplicado"/>
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-shield"></i>
+          <input formControlName="rolNombre" id="rolNombre" type="text" [attr.maxlength]="limitesRolArea.nombre" autocomplete="off" pInputText appContadorCaracteres class="w-100" [class.ng-dirty]="rolDuplicado" [class.ng-invalid]="rolDuplicado"/>
           <label for="rolNombre">Nombre *</label>
         </span>
         <small class="p-error" *ngIf="rolDuplicado">Ya existe un rol con este nombre.</small>
       </div>
 
       <div class="col-12">
-        <span class="p-float-label">
-          <textarea formControlName="rolDescripcion" id="rolDescripcion" [rows]="3" maxlength="200" pInputTextarea class="w-100"></textarea>
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-align-left"></i>
+          <textarea formControlName="rolDescripcion" id="rolDescripcion" [rows]="3" [attr.maxlength]="limitesRolArea.descripcionRol" pInputTextarea appContadorCaracteres class="w-100"></textarea>
           <label for="rolDescripcion">Descripción *</label>
         </span>
       </div>
 
       <div class="col-12">
-        <span class="p-float-label">
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-th-large"></i>
           <p-treeSelect formControlName="Vistas"
                         inputId="rolVistas"
                         containerStyleClass="w-full"
@@ -337,8 +354,8 @@
       </div>
 
       <div class="col-12 d-flex justify-content-end gap-2">
-        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary p-button-outlined" (click)="modalRol = false"></button>
-        <button pButton pRipple type="submit" [label]="editarRol ? 'Guardar Cambios' : 'Crear Rol'" icon="pi pi-save" class="p-button-success"></button>
+        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="modalRol = false"></button>
+        <button pButton pRipple type="submit" [label]="editarRol ? 'Guardar Cambios' : 'Crear Rol'" icon="pi pi-save" class="p-button-danger"></button>
       </div>
     </div>
   </form>
@@ -346,26 +363,28 @@
 
 <!-- ============================== MODAL ÁREA ============================== -->
 <p-dialog [(visible)]="modalArea" [contentStyle]="{'overflow':'visible'}" [style]="{width: '450px'}" [breakpoints]="{'576px': '95vw'}" header="{{areaEditar ? 'Editar' : 'Crear'}} Área" [modal]="true">
-  <form [formGroup]="formAreas" (ngSubmit)="guardarArea()" class="pt-3">
-    <div class="row g-4">
+  <form [formGroup]="formAreas" (ngSubmit)="guardarArea()" class="pt-3" autocomplete="off">
+    <div class="row g-4 formulario-modal">
       <div class="col-12">
-        <span class="p-float-label">
-          <input formControlName="areaNombre" id="areaNombre" type="text" pInputText class="w-100" [class.ng-dirty]="areaDuplicada" [class.ng-invalid]="areaDuplicada"/>
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-sitemap"></i>
+          <input formControlName="areaNombre" id="areaNombre" type="text" [attr.maxlength]="limitesRolArea.nombre" autocomplete="off" pInputText appContadorCaracteres class="w-100" [class.ng-dirty]="areaDuplicada" [class.ng-invalid]="areaDuplicada"/>
           <label for="areaNombre">Nombre *</label>
         </span>
         <small class="p-error" *ngIf="areaDuplicada">Ya existe un área con este nombre.</small>
       </div>
 
       <div class="col-12">
-        <span class="p-float-label">
-          <textarea formControlName="areaDescripcion" id="areaDescripcion" [rows]="2" maxlength="200" pInputTextarea class="w-100"></textarea>
+        <span class="p-float-label p-input-icon-left">
+          <i class="pi pi-align-left"></i>
+          <textarea formControlName="areaDescripcion" id="areaDescripcion" [rows]="3" [attr.maxlength]="limitesRolArea.descripcionArea" pInputTextarea appContadorCaracteres class="w-100"></textarea>
           <label for="areaDescripcion">Descripción</label>
         </span>
       </div>
 
       <div class="col-12 d-flex justify-content-end gap-2">
-        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-secondary p-button-outlined" (click)="modalArea = false"></button>
-        <button pButton pRipple type="submit" [label]="areaEditar ? 'Guardar Cambios' : 'Crear Área'" icon="pi pi-save" class="p-button-success"></button>
+        <button pButton pRipple type="button" label="Cancelar" icon="pi pi-times" class="p-button-text p-button-secondary" (click)="modalArea = false"></button>
+        <button pButton pRipple type="submit" [label]="areaEditar ? 'Guardar Cambios' : 'Crear Área'" icon="pi pi-save" class="p-button-danger"></button>
       </div>
     </div>
   </form>
