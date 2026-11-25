@@ -37,13 +37,36 @@ export class ContadorCaracteresDirective implements AfterViewInit, OnDestroy {
     @Optional() @Self() private control: NgControl | null,
   ) { }
 
+  /** Envoltura creada por la directiva cuando el contenedor del campo no es propio (ver ngAfterViewInit). */
+  private envoltura?: HTMLElement;
+
+  /**
+   * Contenedores que envuelven solo al campo (su etiqueta flotante o ícono van superpuestos): el contador se ubica
+   * respecto a ellos. No se envuelve el campo en otro elemento porque sus estilos dependen de que el campo y la
+   * etiqueta/ícono sean hermanos (p. ej. ".p-float-label > input:focus ~ label").
+   */
+  private static readonly CONTENEDORES_PROPIOS = ['p-float-label', 'p-input-icon-left', 'p-input-icon-right'];
+
   ngAfterViewInit(): void {
     const campo = this.elemento.nativeElement;
-    const contenedor = campo.parentElement;
+    let contenedor = campo.parentElement;
     if (!contenedor) return;
 
-    // El contador se ubica respecto al contenedor del campo (p. ej. el span.p-float-label).
-    if (getComputedStyle(contenedor).position === 'static') this.renderer.setStyle(contenedor, 'position', 'relative');
+    // Si el contenedor tiene más cosas en el flujo (p. ej. un div con la etiqueta encima y el error debajo), el
+    // contador se ubicaría respecto a todo ese bloque: se envuelve el campo en un span de su mismo tamaño.
+    const esPropio = ContadorCaracteresDirective.CONTENEDORES_PROPIOS.some(c => contenedor!.classList.contains(c));
+    if (!esPropio) {
+      this.envoltura = this.renderer.createElement('span');
+      this.renderer.addClass(this.envoltura, 'contador-caracteres-envoltura');
+      this.renderer.insertBefore(contenedor, this.envoltura, campo);
+      this.renderer.appendChild(this.envoltura, campo);
+      contenedor = this.envoltura!;
+    }
+
+    // El contador se ubica respecto al contenedor. Si el campo aún no se dibuja (p. ej. dentro de un p-dialog que se
+    // está abriendo), getComputedStyle devuelve '' en vez de 'static': también se fija position: relative.
+    const posicion = getComputedStyle(contenedor).position;
+    if (!posicion || posicion === 'static') this.renderer.setStyle(contenedor, 'position', 'relative');
 
     this.contador = this.renderer.createElement('small');
     this.renderer.addClass(this.contador, 'contador-caracteres');
@@ -81,6 +104,9 @@ export class ContadorCaracteresDirective implements AfterViewInit, OnDestroy {
   ngOnDestroy(): void {
     this.cambiosValor?.unsubscribe();
     if (this.contador) this.contador.remove();
+    // La envoltura se quita junto con el campo cuando Angular lo saca de la vista; si quedara vacía, se borra.
+    const envoltura = this.envoltura;
+    if (envoltura) setTimeout(() => { if (!envoltura.querySelector('input, textarea')) envoltura.remove(); });
   }
 
   /** Máximo configurado: el valor de la directiva o el `maxlength` del campo; null si no hay límite. */

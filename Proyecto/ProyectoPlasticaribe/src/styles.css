@@ -1231,6 +1231,15 @@ p-avatar div span {
   padding-right: 4rem !important;
 }
 
+/* Envoltura que crea la directiva cuando el campo no tiene un contenedor propio (p. ej. un div con la etiqueta
+   encima y el error debajo): mide lo mismo que el campo, así el contador queda dentro de él. */
+.contador-caracteres-envoltura {
+  position: relative;
+  display: block;
+  width: 100%;
+  min-width: 0;
+}
+
 /* Contador superpuesto en la esquina inferior derecha del campo; no intercepta clics. */
 .contador-caracteres {
   position: absolute;
