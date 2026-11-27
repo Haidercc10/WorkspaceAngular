@@ -451,8 +451,27 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
         return;
       }
       const motivo = this.motivoOTNoAdmite;
-      if (motivo) this.mensajeService.mensajeAdvertencia('Advertencia', motivo, DURACION_ERROR_MS);
+      if (motivo) return this.mensajeService.mensajeAdvertencia('Advertencia', motivo, DURACION_ERROR_MS);
+      // Asignación directa: se avisa desde ya, para no llenar los materiales en vano (al crear se vuelve a revisar).
+      if (!this.esSolicitud) this.avisarSolicitudesActivas(ot, resumen);
     });
+  }
+
+  /**
+   * Avisa si la OT tiene solicitudes de material pendientes o parciales, que se deben asignar desde Movimientos de
+   * solicitudes y no con una asignación directa.
+   * @returns True si las tiene (y avisó).
+   */
+  private avisarSolicitudesActivas(ot: number, resumen: ResumenSolicitudOT | null, titulo: string = 'Advertencia'): boolean {
+    const activas = (resumen?.solicitudes ?? [])
+      .filter(s => s.estado_Id === EstadoSolicitudMaterial.Pendiente || s.estado_Id === EstadoSolicitudMaterial.Parcial)
+      .reduce((total, s) => total + s.cantidad, 0);
+    if (activas === 0) return false;
+    const texto = activas === 1 ? '1 solicitud de material pendiente o parcial' : `${activas} solicitudes de material pendientes o parciales`;
+    this.mensajeService.mensajeAdvertencia(titulo,
+      `La OT N° ${ot} tiene ${texto} por revisar. Asígnela desde Movimientos de solicitudes de materia prima, con el botón "Crear asignación" de la solicitud.`,
+      DURACION_ERROR_MS);
+    return true;
   }
 
   /**
@@ -557,7 +576,31 @@ export class AsignacionMateriaPrimaComponent implements OnInit, OnDestroy {
       return this.mensajeService.mensajeAdvertencia('Advertencia', 'Existen materiales con cantidades solicitadas mayores a su stock, por favor, verifique!');
     }
     this.materiasPrimasSeleccionadas.forEach(m => m.Cantidad = redondear2(m.Cantidad));
-    if (this.validarEncabezado()) this.crearAsignacion();
+    if (this.validarEncabezado()) this.validarSinSolicitudesActivas();
+  }
+
+  /**
+   * Asignación directa (sin solicitud): antes de crearla consulta de nuevo la OT y, si tiene solicitudes de material
+   * pendientes o parciales, la impide. Esas solicitudes se asignan desde Movimientos de solicitudes de materia prima
+   * (botón "Crear asignación"); asignar aquí descontaría esos kg dos veces en lo que falta por solicitar.
+   */
+  private validarSinSolicitudesActivas() {
+    if (this.cargando) return;
+    const ot = Number(this.FormMateriaPrimaRetiro.value.OTRetiro);
+    this.cargando = true;
+    this.servicioSolicitudes.obtenerResumenOT(ot).pipe(
+      // 404: la OT no tiene solicitudes, se puede asignar directo.
+      catchError((error: HttpErrorResponse) => error.status === 404 ? of(null) : of(error)),
+      takeUntil(this.destroy$),
+    ).subscribe(respuesta => {
+      this.cargando = false;
+      if (respuesta instanceof HttpErrorResponse)
+        return this.notificarError(respuesta, `No se pudo revisar si la OT N° ${ot} tiene solicitudes de material pendientes.`, 'Consultar solicitudes de la OT');
+
+      this.solicitudOT = respuesta;
+      if (this.avisarSolicitudesActivas(ot, respuesta, 'No se puede crear la asignación')) return;
+      this.crearAsignacion();
+    });
   }
 
   /** Valida el formulario de la asignación y la OT. Devuelve false (y avisa) si falta algo. */
