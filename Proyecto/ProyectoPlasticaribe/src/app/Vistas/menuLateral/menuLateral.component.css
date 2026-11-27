@@ -840,33 +840,151 @@ p-dialog ::ng-deep div .p-dialog-title {
   }
 }
 
-/* ---------- Recordatorios de eventos (toast arriba a la derecha, debajo de la barra superior) ----------
-   El color lo pone la severidad del toast: info (30 y 15 min antes) y warn (al iniciar). */
-:host ::ng-deep .toast-recordatorio-evento.p-toast-top-right {
-  top: 5.5rem;
+/* ---------- Panel de novedades de tickets (botón de tickets de la barra superior) ---------- */
+/* El panel se anexa al body (fuera de :host): el ancho va en [style] y aquí solo el relleno, con su clase propia */
+::ng-deep .panel-novedades-tickets .p-overlaypanel-content {
+  padding: 0;
 }
 
-.recordatorio-evento {
+.novedades-tickets {
   display: flex;
-  align-items: flex-start;
-  gap: 0.75rem;
-  flex: 1;
-  min-width: 0;
+  flex-direction: column;
 }
 
-.recordatorio-evento-icono {
-  font-size: 1.75rem;
+.novedades-encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--borde-sutil);
 }
 
-.recordatorio-evento-texto {
-  flex: 1;
-  min-width: 0;
+.novedades-titulo {
+  font-weight: 700;
+  color: var(--texto-fuerte);
+}
+
+.novedades-titulo .pi {
+  color: var(--rojo-texto);
+  margin-right: 0.25rem;
+}
+
+.novedades-total {
+  min-width: 1.5rem;
+  padding: 0.1rem 0.5rem;
+  border-radius: 1rem;
+  background: var(--fondo-contador);
+  color: var(--texto-contador);
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+/* Solo soporte: abiertos y en revisión, lleva a Gestionar tickets */
+.novedades-pendientes {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 0; /* franja de todo el ancho, pegada al separador del encabezado (los botones globales traen borde redondo) */
+  border-bottom: 1px solid var(--borde-sutil);
+  background: var(--fondo-sutil);
+  color: var(--texto-fuerte);
+  font-size: 0.85rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.novedades-pendientes:hover {
+  background: var(--fondo-acento);
+}
+
+.novedades-lista {
+  max-height: min(60vh, 26rem);
+  overflow-y: auto;
+}
+
+.novedad {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  width: 100%;
+  padding: 0.6rem 1rem;
+  border: none;
+  border-bottom: 1px solid var(--borde-sutil);
+  background: transparent;
+  color: var(--texto-fuerte);
+  text-align: left;
+  cursor: pointer;
   overflow-wrap: anywhere;
 }
 
-.recordatorio-evento-acciones {
+.novedad:hover,
+.novedad:focus-visible {
+  background: var(--fondo-acento);
+  outline: none;
+}
+
+.novedad-titulo {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.novedad-asunto,
+.novedad-autor {
+  font-size: 0.85rem;
+}
+
+.novedad-autor {
+  color: var(--text-color-secondary);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.novedad-fecha,
+.novedades-mas {
+  font-size: 0.75rem;
+  color: var(--text-color-secondary);
+}
+
+.novedades-mas {
+  display: block;
+  padding: 0.5rem 1rem;
+}
+
+.novedades-vacio {
+  margin: 0;
+  padding: 1.25rem 1rem;
+  text-align: center;
+  color: var(--text-color-secondary);
+}
+
+.novedades-vacio .pi {
+  color: var(--texto-exito);
+  margin-right: 0.25rem;
+}
+
+.novedades-pie {
   display: flex;
+  align-items: center;
+  justify-content: space-between;
   flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.75rem;
+  gap: 0.25rem;
+  padding: 0.5rem 1rem;
+}
+
+.novedades-enlaces {
+  margin-left: auto;
+  font-size: 0.85rem;
+}
+
+.novedades-enlaces a {
+  color: var(--rojo-texto);
+  cursor: pointer;
+  font-weight: 600;
 }

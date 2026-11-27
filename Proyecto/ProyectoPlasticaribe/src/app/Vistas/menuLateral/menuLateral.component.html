@@ -18,11 +18,11 @@
                 [attr.aria-pressed]="esFavorita">
           <i class="pi font-size-25" [ngClass]="guardandoFavorito ? 'pi-spin pi-spinner' : (esFavorita ? 'pi-star-fill' : 'pi-star')"></i>
         </button>
-        <!-- Tickets abiertos y en revisión (solo administradores con permiso a Gestionar Tickets) -->
-        <button type="button" class="botonBadge" *ngIf="ValidarRol == 1 && cantidadesTickets" (click)="irAGestionTickets()"
+        <!-- Tickets (todos): novedades sin leer; abre el panel de novedades (soporte ve además abiertos y en revisión) -->
+        <button type="button" class="botonBadge" #botonTickets (click)="panelNovedades.toggle($event)"
                 [pTooltip]="tooltipTickets" tooltipPosition="bottom" [attr.aria-label]="tooltipTickets">
           <i class="pi pi-ticket font-size-25"></i>
-          <p-badge *ngIf="totalTicketsPendientes > 0" [value]="totalTicketsPendientes > 99 ? '99+' : totalTicketsPendientes.toString()"></p-badge>
+          <p-badge *ngIf="novedadesTickets.total > 0" [value]="novedadesTickets.total > 99 ? '99+' : novedadesTickets.total.toString()"></p-badge>
         </button>
         <!-- El badge solo aparece cuando hay algo nuevo (con 0 se oculta) -->
         <button type="button" class="botonBadge" *ngIf="[1,6,2].includes(ValidarRol)" (click)="modalCorreos = true"
@@ -253,24 +253,51 @@
   </p-dialog>
 
   <!-- Recordatorios de eventos con hora: 30 y 15 min antes y al iniciar -->
-  <p-toast [key]="claveToastRecordatorio" position="top-right" styleClass="toast-recordatorio-evento"
-           [breakpoints]="{'640px': {width: '100%', right: '0', left: '0'}}" (onClose)="alCerrarRecordatorio($event.message)">
-    <ng-template let-message pTemplate="message">
-      <div class="recordatorio-evento">
-        <i class="pi pi-clock recordatorio-evento-icono"></i>
-        <div class="recordatorio-evento-texto">
-          <div class="p-toast-summary">{{message.summary}}</div>
-          <div class="p-toast-detail">{{message.detail}}</div>
-          <div class="recordatorio-evento-acciones">
-            <button pButton type="button" class="p-button-sm botonVerCalendario" icon="pi pi-calendar" label="Ver calendario"
-                    (click)="verCalendarioDesdeRecordatorio(message)"></button>
-            <button pButton type="button" class="p-button-sm p-button-text p-button-secondary" icon="pi pi-ban" label="No mostrar más hoy"
-                    (click)="noMostrarEventosHoy()"></button>
-          </div>
-        </div>
-      </div>
-    </ng-template>
-  </p-toast>
+  <!-- Panel de novedades de tickets (botón de tickets de la barra superior) -->
+        <p-overlayPanel #panelNovedades styleClass="panel-novedades-tickets" appendTo="body" [style]="{ width: '24rem', maxWidth: 'calc(100vw - 32px)' }"
+                        (onShow)="centrarFlechaPanel(panelNovedades, botonTickets)">
+          <ng-template pTemplate="content">
+            <div class="novedades-tickets">
+              <div class="novedades-encabezado">
+                <span class="novedades-titulo"><i class="pi pi-ticket"></i> Novedades de tickets</span>
+                <span class="novedades-total" *ngIf="novedadesTickets.total > 0">{{ novedadesTickets.total }}</span>
+              </div>
+              <button type="button" class="novedades-pendientes" *ngIf="cantidadesTickets" (click)="irAGestionTicketsDesdePanel(panelNovedades)">
+                <span><b>{{ cantidadesTickets.abiertos }}</b> abierto(s) · <b>{{ cantidadesTickets.enRevision }}</b> en revisión</span>
+                <i class="pi pi-arrow-right"></i>
+              </button>
+
+              <div class="novedades-lista" *ngIf="filasNovedades.length; else sinNovedades">
+                <button type="button" class="novedad" *ngFor="let fila of filasNovedades" (click)="verNovedadTicket(fila.novedad, panelNovedades)">
+                  <span class="novedad-titulo">{{ tituloNovedad(fila.novedad) }}</span>
+                  <span class="novedad-asunto">{{ fila.novedad.asunto }}</span>
+                  <span class="novedad-autor">{{ autorNovedad(fila.novedad) }}</span>
+                  <span class="novedad-fecha">
+                    {{ haceCuanto(fila.novedad.fecha) }}
+                    <ng-container *ngIf="fila.cantidad > 1"> · {{ fila.cantidad }} novedades</ng-container>
+                  </span>
+                </button>
+                <small class="novedades-mas" *ngIf="novedadesTickets.total > novedadesTickets.notificaciones.length">
+                  Hay más novedades; se muestran las {{ novedadesTickets.notificaciones.length }} más antiguas sin leer.
+                </small>
+              </div>
+              <ng-template #sinNovedades>
+                <p class="novedades-vacio"><i class="pi pi-check-circle"></i> No tiene novedades en sus tickets.</p>
+              </ng-template>
+
+              <div class="novedades-pie">
+                <button pButton type="button" class="p-button-sm p-button-text p-button-secondary" icon="pi pi-check" label="Marcar todo como leído"
+                        *ngIf="novedadesTickets.total > 0" (click)="marcarNovedadesLeidas(panelNovedades)"></button>
+                <span class="novedades-enlaces">
+                  <a role="button" tabindex="0" (click)="irAMisTickets(panelNovedades)" (keydown.enter)="irAMisTickets(panelNovedades)">Mis tickets</a>
+                  <ng-container *ngIf="cantidadesTickets">
+                    · <a role="button" tabindex="0" (click)="irAGestionTicketsDesdePanel(panelNovedades)" (keydown.enter)="irAGestionTicketsDesdePanel(panelNovedades)">Gestionar tickets</a>
+                  </ng-container>
+                </span>
+              </div>
+            </div>
+          </ng-template>
+        </p-overlayPanel>
 
   <!-- Correos de la página web -->
   <p-dialog [(visible)]="modalCorreos" [style]="{width: '90vw', maxWidth: '1400px'}" [breakpoints]="{'900px': '100vw'}"

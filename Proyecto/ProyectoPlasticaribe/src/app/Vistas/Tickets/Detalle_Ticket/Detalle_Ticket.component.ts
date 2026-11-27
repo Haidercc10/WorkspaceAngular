@@ -1,4 +1,5 @@
-import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges, inject } from '@angular/core';
+import { NotificacionesTicketsService } from 'src/app/Servicios/Tickets/NotificacionesTickets.service';
 import { HttpErrorResponse } from '@angular/common/http';
 import { forkJoin, of, Subscription } from 'rxjs';
 import { catchError, timeout } from 'rxjs/operators';
@@ -38,6 +39,8 @@ export class Detalle_TicketComponent implements OnChanges {
   comentario : string = '';
   cargando : boolean = false;
   enviando : boolean = false;
+
+  private readonly notificaciones = inject(NotificacionesTicketsService);
 
   constructor(private ticketService : TicketsService,
                 private msj : MensajesAplicacionService,
@@ -87,6 +90,8 @@ export class Detalle_TicketComponent implements OnChanges {
     this.ticketService.getDetalle(this.codigo).subscribe({
       next: detalle => {
         this.detalle = detalle;
+        // Abrir el ticket es verlo: sus novedades quedan leídas y su aviso de la esquina se quita
+        this.notificaciones.marcarLeidas(detalle.ticket.codigo);
         this.acciones = this.calcularAcciones();
         this.calcularLineasHistorial();
         this.cargando = false;

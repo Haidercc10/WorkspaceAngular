@@ -1,4 +1,7 @@
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Detalle_TicketComponent } from '../Tickets/Detalle_Ticket/Detalle_Ticket.component';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import moment from 'moment';
 import { Table } from 'primeng/table';
@@ -97,6 +100,10 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
 
   codigoDetalle : number | null = null;
   detalleVisible : boolean = false;
+  @ViewChild('detalleTicket') detalleTicket? : Detalle_TicketComponent;
+  private readonly route = inject(ActivatedRoute);
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private AppComponent : AppComponent,
                 private ticketService : TicketsService,
@@ -106,6 +113,25 @@ export class Gestion_TicketsComponent implements OnInit, OnDestroy {
   ngOnInit() {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
     this.consultar();
+    // "Ver ticket" de los avisos de novedades llega con ?ticket=<código> (también estando ya en esta página)
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(parametros => {
+      const ticket = Number(parametros.get('ticket'));
+      if (ticket > 0) this.abrirTicketDesdeAviso(ticket);
+    });
+  }
+
+  /**
+   * Abre (o recarga, si ya está abierto) el detalle del ticket del aviso, recarga la tabla y quita ?ticket de la URL
+   * para que al recargar no se vuelva a abrir y el mismo aviso funcione de nuevo.
+   */
+  private abrirTicketDesdeAviso(codigo : number) {
+    if (this.detalleVisible && this.codigoDetalle === codigo) this.detalleTicket?.cargar();
+    else {
+      this.codigoDetalle = codigo;
+      this.detalleVisible = true;
+      this.consultar();
+    }
+    this.router.navigate([], { relativeTo: this.route, queryParams: { ticket: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   ngOnDestroy() {

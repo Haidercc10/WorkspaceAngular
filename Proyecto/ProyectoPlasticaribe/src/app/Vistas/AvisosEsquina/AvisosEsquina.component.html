@@ -1,0 +1,18 @@
+<p-toast [key]="claveToast" position="top-right" styleClass="toast-aviso-esquina"
+         [breakpoints]="{'640px': {width: '100%', right: '0', left: '0'}}" (onClose)="avisos.alCerrar($event.message)">
+  <ng-template let-message pTemplate="message">
+    <div class="aviso-esquina">
+      <i class="aviso-esquina-icono" [ngClass]="message.data.icono"></i>
+      <div class="aviso-esquina-texto">
+        <div class="p-toast-summary">{{message.summary}}</div>
+        <div class="p-toast-detail">{{message.detail}}</div>
+        <div class="aviso-esquina-acciones" *ngIf="message.data.acciones?.length">
+          <button *ngFor="let accion of message.data.acciones; let primera = first; trackBy: trackAccion"
+                  pButton type="button" class="p-button-sm" [icon]="accion.icono" [label]="accion.etiqueta"
+                  [ngClass]="primera ? 'aviso-esquina-principal' : 'p-button-text p-button-secondary'"
+                  (click)="accion.accion()"></button>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</p-toast>

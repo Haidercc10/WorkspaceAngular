@@ -174,6 +174,7 @@ import { Solicitud_Rollos_BodegasComponent } from './Vistas/Solicitud_Rollos_Bod
 import { TicketsComponent } from './Vistas/Tickets/Tickets.component';
 import { FormularioTicketComponent } from './Vistas/Tickets/Formulario_Ticket/Formulario_Ticket.component';
 import { BotonSoporteComponent } from './Vistas/BotonSoporte/BotonSoporte.component';
+import { AvisosEsquinaComponent } from './Vistas/AvisosEsquina/AvisosEsquina.component';
 import { Detalle_TicketComponent } from './Vistas/Tickets/Detalle_Ticket/Detalle_Ticket.component';
 import { VistasFavoritasComponent } from './Vistas/VistasFavoritas/VistasFavoritas.component';
 import { AsignacionTintasComponent } from './Vistas/asignacion-Tintas/asignacion-Tintas.component';
@@ -342,6 +343,7 @@ import { UnifiedErrorInterceptor } from './_helpers/unified-error.interceptor';
     TicketsComponent,
     FormularioTicketComponent,
     BotonSoporteComponent,
+    AvisosEsquinaComponent,
     Detalle_TicketComponent,
     Gestion_TicketsComponent,
     DashboardOTComponent,

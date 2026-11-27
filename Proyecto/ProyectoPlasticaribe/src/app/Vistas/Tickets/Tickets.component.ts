@@ -1,4 +1,6 @@
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, DestroyRef, OnDestroy, OnInit, ViewChild, inject } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Detalle_TicketComponent } from './Detalle_Ticket/Detalle_Ticket.component';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TutorialesService } from 'src/app/Servicios/Tutoriales/Tutoriales.service';
 import { MessageService } from 'primeng/api';
@@ -33,6 +35,8 @@ export class TicketsComponent implements OnInit, OnDestroy {
   esSoporte : boolean = false;
   codigoDetalle : number | null = null;
   detalleVisible : boolean = false;
+  @ViewChild('detalleTicket') detalleTicket? : Detalle_TicketComponent;
+  private readonly destroyRef = inject(DestroyRef);
 
   constructor(private AppComponent : AppComponent,
                 private ticketService : TicketsService,
@@ -44,8 +48,14 @@ export class TicketsComponent implements OnInit, OnDestroy {
 
   ngOnInit() {
     this.modoSeleccionado = this.AppComponent.temaSeleccionado;
-    // "VER MIS TICKETS" del aviso del botón flotante de soporte llega con ?pestana=mis-tickets
-    if (this.route.snapshot.queryParamMap.get('pestana') === 'mis-tickets') this.cambioTab(1);
+    // "VER MIS TICKETS" del aviso del botón flotante de soporte llega con ?pestana=mis-tickets; "Ver ticket" de los
+    // avisos de novedades, además con ?ticket=<código>. Se escucha (no solo el snapshot) porque el aviso puede usarse
+    // estando ya en esta página.
+    this.route.queryParamMap.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(parametros => {
+      const ticket = Number(parametros.get('ticket'));
+      if (parametros.get('pestana') === 'mis-tickets' && (this.tabActiva !== 1 || ticket > 0)) this.cambioTab(1);
+      if (ticket > 0) this.abrirTicketDesdeAviso(ticket);
+    });
     this.ticketService.getPermisos().subscribe(p => {
       this.esSoporte = p.esSoporte;
       // Se espera a conocer el rol para que soporte vea también sus pasos extra
@@ -127,6 +137,19 @@ export class TicketsComponent implements OnInit, OnDestroy {
   abrirDetalle(ticket : TicketListado) {
     this.codigoDetalle = ticket.codigo;
     this.detalleVisible = true;
+  }
+
+  /**
+   * Abre (o recarga, si ya está abierto) el detalle del ticket del aviso de novedades y quita ?ticket de la URL,
+   * para que al recargar no se vuelva a abrir y el mismo aviso funcione de nuevo.
+   */
+  private abrirTicketDesdeAviso(codigo : number) {
+    if (this.detalleVisible && this.codigoDetalle === codigo) this.detalleTicket?.cargar();
+    else {
+      this.codigoDetalle = codigo;
+      this.detalleVisible = true;
+    }
+    this.router.navigate([], { relativeTo: this.route, queryParams: { ticket: null }, queryParamsHandling: 'merge', replaceUrl: true });
   }
 
   cerrarDetalle = () => this.codigoDetalle = null;

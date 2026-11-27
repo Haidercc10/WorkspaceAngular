@@ -5,7 +5,8 @@
 <app-VistasFavoritas *ngIf="this.ValidarRol"></app-VistasFavoritas>
 <!-- Botón flotante para reportar a soporte (oculto en Tickets, Gestión de Tickets y login) -->
 <app-boton-soporte *ngIf="this.ValidarRol"></app-boton-soporte>
-
+<!-- Avisos de la esquina superior derecha: recordatorios del calendario y novedades de tickets -->
+<app-avisos-esquina *ngIf="this.ValidarRol"></app-avisos-esquina>
 <!--
 <ng-container *ngIf="ValidarRol">
     <app-menuLateral></app-menuLateral>

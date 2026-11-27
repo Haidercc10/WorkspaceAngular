@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import moment from 'moment';
 import { CookieService } from 'ngx-cookie-service';
-import { MenuItem, Message, MessageService } from 'primeng/api';
+import { MenuItem } from 'primeng/api';
 import { EventoCalendario, EventosCalendarioService } from 'src/app/Servicios/EventosCalendario/EventosCalendario.service';
 import { MensajesAplicacionService } from 'src/app/Servicios/MensajesAplicacion/MensajesAplicacion.service';
 import { RolesService } from 'src/app/Servicios/Roles/roles.service';
@@ -24,6 +24,9 @@ import { NavigationEnd } from '@angular/router';
 import { combineLatest, filter, fromEvent, interval, merge, startWith, switchMap, throttleTime } from 'rxjs';
 import { DestroyRef } from '@angular/core';
 import { CantidadesTickets, TicketsService } from 'src/app/Servicios/Tickets/Tickets.service';
+import { autorNovedadTicket, NotificacionesTicketsService, NotificacionTicket, NovedadesTickets, tituloNovedadTicket, ultimaNovedadPorTicket } from 'src/app/Servicios/Tickets/NotificacionesTickets.service';
+import { OverlayPanel } from 'primeng/overlaypanel';
+import { AvisosEsquinaService } from 'src/app/Servicios/AvisosEsquina/AvisosEsquina.service';
 import { EncriptacionService } from 'src/app/Servicios/Encriptacion/Encriptacion.service';
 
 /** Cada cuánto se refrescan los contadores de la barra superior mientras la pestaña está visible. */
@@ -36,8 +39,8 @@ const HITOS_RECORDATORIO_MIN = [30, 15, 0];
 const GRACIA_INICIO_MS = 2 * 60 * 1000;
 /** Cada cuánto se revisan los recordatorios mientras la pestaña está visible. */
 const REVISION_RECORDATORIOS_MS = 30 * 1000;
-/** Clave del p-toast de recordatorios (menuLateral.component.html). */
-const CLAVE_TOAST_RECORDATORIO = 'recordatorioEvento';
+/** Prefijo de los recordatorios de eventos en los avisos de la esquina (AvisosEsquinaService). */
+const PREFIJO_AVISO_EVENTO = 'evento:';
 /**
  * localStorage, por usuario: día (YYYY-MM-DD) en que eligió "No mostrar más hoy" (sin aviso al entrar ni recordatorios),
  * y recordatorios ya mostrados ("id|inicio" → menor hito mostrado), compartidos entre pestañas y recargas.
@@ -94,10 +97,9 @@ export class MenuLateralComponent implements OnInit {
   eventosHoy: EventoCalendario[] = []; //Eventos que ocurren hoy (aviso "Eventos de hoy")
   eventosMes: EventoCalendario[] = []; //Eventos de hoy a fin de mes (badge y sección "Eventos" del menú de usuario)
   eventosDia: boolean = false; //Variable que indica si se mostrará el modal con los eventos del día
-  readonly claveToastRecordatorio = CLAVE_TOAST_RECORDATORIO;
-  private readonly messageService = inject(MessageService);
-  /** Recordatorios visibles, uno por evento (id): al pasar al siguiente hito o cambiar la hora se reemplaza el anterior. */
-  private recordatoriosVisibles = new Map<number, Message>();
+  /** Recordatorios de eventos (uno por evento: al pasar al siguiente hito o cambiar la hora se reemplaza) y novedades de tickets. */
+  private readonly avisosEsquina = inject(AvisosEsquinaService);
+  private readonly notificacionesTickets = inject(NotificacionesTicketsService);
   cantidadCorreosNuevos: number = 0; //Variable que almacenará la cantidad de correos nuevos que hay en el sistema
   modoSeleccionado: boolean;
   private readonly suscripcionTema = alCambiarTema(oscuro => this.modoSeleccionado = oscuro); // mantiene los logos y el "Ahora: …" al día con el tema
@@ -125,16 +127,63 @@ export class MenuLateralComponent implements OnInit {
   vistaActual: VistaFavorita | null = null; // vista de la página actual, si el rol puede tenerla como acceso rápido
   esFavorita: boolean = false;
   guardandoFavorito: boolean = false;
-  // Botón de tickets (rol 1): abiertos + en revisión. cantidadesTickets queda en null si el rol no tiene permiso a Gestionar Tickets
+  // Botón de tickets (todos): su número son las novedades sin leer y abre el panel de novedades. A soporte (rol 1) el
+  // panel y el tooltip le muestran además los abiertos y en revisión; cantidadesTickets queda en null para los demás.
   private readonly ticketsService = inject(TicketsService);
   cantidadesTickets: CantidadesTickets | null = null;
-  totalTicketsPendientes: number = 0;
-  tooltipTickets: string = 'Gestionar tickets';
-  private readonly suscripcionTickets = this.ticketsService.cantidadesSoporte$.pipe(takeUntilDestroyed()).subscribe(c => {
+  novedadesTickets: NovedadesTickets = { total: 0, notificaciones: [] };
+  /** Última novedad de cada ticket, la más reciente primero (filas del panel). */
+  filasNovedades: { novedad: NotificacionTicket; cantidad: number }[] = [];
+  tooltipTickets: string = 'Tickets';
+  private readonly suscripcionTickets = combineLatest([
+    this.ticketsService.cantidadesSoporte$,
+    this.notificacionesTickets.novedades$,
+  ]).pipe(takeUntilDestroyed()).subscribe(([c, novedades]) => {
     this.cantidadesTickets = c;
-    this.totalTicketsPendientes = c ? c.abiertos + c.enRevision : 0;
-    this.tooltipTickets = c ? `Tickets: ${c.abiertos} abierto(s), ${c.enRevision} en revisión` : 'Gestionar tickets';
+    this.novedadesTickets = novedades;
+    this.filasNovedades = ultimaNovedadPorTicket(novedades.notificaciones);
+    const partes = [novedades.total > 0 ? `${novedades.total} novedad(es) sin leer` : 'sin novedades'];
+    if (c) partes.push(`${c.abiertos} abierto(s), ${c.enRevision} en revisión`);
+    this.tooltipTickets = `Tickets: ${partes.join(' · ')}`;
   });
+  readonly tituloNovedad = tituloNovedadTicket;
+  readonly autorNovedad = autorNovedadTicket;
+  /** Fecha relativa de la novedad ("hace 5 minutos"). */
+  haceCuanto = (fecha: string) => moment(fecha).fromNow();
+
+  /** Abre el ticket de la novedad desde el panel. */
+  verNovedadTicket(n: NotificacionTicket, panel: OverlayPanel) {
+    panel.hide();
+    this.notificacionesTickets.verTicket(n.ticketId, n.esMio);
+  }
+
+  /**
+   * PrimeNG pone la punta del panel a 1.25rem del borde izquierdo del botón (menos dos veces el radio del panel), no
+   * en su centro; como el panel se corre a la izquierda para no salirse de la pantalla, la punta quedaba antes del
+   * ícono. Se recalcula para que apunte al centro del botón (1.25rem según el tamaño de letra actual).
+   */
+  centrarFlechaPanel(panel: OverlayPanel, boton: HTMLElement) {
+    const contenedor = panel.container;
+    if (!contenedor) return;
+    const rem = parseFloat(getComputedStyle(this.document.documentElement).fontSize) || 16;
+    const centroBoton = boton.getBoundingClientRect().left + boton.offsetWidth / 2;
+    contenedor.style.setProperty('--overlayArrowLeft', `${centroBoton - contenedor.getBoundingClientRect().left - 1.25 * rem}px`);
+  }
+
+  marcarNovedadesLeidas(panel: OverlayPanel) {
+    panel.hide();
+    this.notificacionesTickets.marcarTodasLeidas();
+  }
+
+  irAMisTickets(panel: OverlayPanel) {
+    panel.hide();
+    this.router.navigate(['/Tickets'], { queryParams: { pestana: 'mis-tickets' } });
+  }
+
+  irAGestionTicketsDesdePanel(panel: OverlayPanel) {
+    panel.hide();
+    this.irAGestionTickets();
+  }
 
   tooltipCalendario: string = 'Calendario de eventos';
   private readonly destroyRef = inject(DestroyRef);
@@ -177,6 +226,7 @@ export class MenuLateralComponent implements OnInit {
     this.cantidadEventosMes();
     this.consultarEventosHoy();
     this.programarRecordatoriosEventos();
+    this.notificacionesTickets.iniciar(this.destroyRef);
     this.cargarMenuLateral();
     if (this.ValidarRol == 1) this.ticketsService.cargarCantidadesSoporte().subscribe();
     this.programarRefrescoContadores();
@@ -633,8 +683,7 @@ export class MenuLateralComponent implements OnInit {
   noMostrarEventosHoy() {
     try { localStorage.setItem(LLAVE_EVENTOS_SILENCIADOS + this.storage_Id, moment().format('YYYY-MM-DD')); } catch { }
     this.eventosDia = false;
-    this.recordatoriosVisibles.clear();
-    this.messageService.clear(CLAVE_TOAST_RECORDATORIO);
+    this.avisosEsquina.quitarSi(a => a.id.startsWith(PREFIJO_AVISO_EVENTO));
   }
 
   private eventosSilenciadosHoy(): boolean {
@@ -680,11 +729,7 @@ export class MenuLateralComponent implements OnInit {
 
     // Recordatorios en pantalla de eventos eliminados o con otra hora de inicio (si la nueva ya tocaba, se reemplazó arriba)
     const inicios = new Map(this.eventosMes.map(e => [e.id, e.inicio.getTime()]));
-    const obsoletos = [...this.recordatoriosVisibles.entries()].filter(([id, m]) => inicios.get(id) !== m.data.inicio);
-    if (obsoletos.length) {
-      obsoletos.forEach(([id]) => this.recordatoriosVisibles.delete(id));
-      this.redibujarRecordatorios();
-    }
+    this.avisosEsquina.quitarSi(a => a.id.startsWith(PREFIJO_AVISO_EVENTO) && inicios.get(a.datos.id) !== a.datos.inicio);
 
     // Se olvidan los registros de eventos que empezaron hace más de un día
     for (const llave of Object.keys(mostrados)) {
@@ -701,32 +746,20 @@ export class MenuLateralComponent implements OnInit {
     // Los minutos que faltan de verdad: si el evento se creó con poca anticipación o la pestaña estuvo oculta,
     // el hito de 30 puede salir cuando faltan 20.
     const faltan = Math.ceil((evento.inicio.getTime() - Date.now()) / 60000);
-    this.recordatoriosVisibles.set(evento.id, {
-      key: CLAVE_TOAST_RECORDATORIO,
-      severity: hito == 0 ? 'warn' : 'info',
-      summary: hito == 0 || faltan <= 0 ? 'El evento empieza ahora'
+    const id = PREFIJO_AVISO_EVENTO + evento.id;
+    this.avisosEsquina.mostrar({
+      id,
+      severidad: hito == 0 ? 'warn' : 'info',
+      icono: 'pi pi-clock',
+      titulo: hito == 0 || faltan <= 0 ? 'El evento empieza ahora'
         : `El evento empieza en ${faltan} ${faltan == 1 ? 'minuto' : 'minutos'}`,
-      detail: `${evento.nombre} · ${horario}`,
-      sticky: true,
-      data: { id: evento.id, inicio: evento.inicio.getTime() },
+      detalle: `${evento.nombre} · ${horario}`,
+      datos: { id: evento.id, inicio: evento.inicio.getTime() },
+      acciones: [
+        { etiqueta: 'Ver calendario', icono: 'pi pi-calendar', accion: () => { this.avisosEsquina.quitar(id); this.mostrarModalCalendario(); } },
+        { etiqueta: 'No mostrar más hoy', icono: 'pi pi-ban', accion: () => this.noMostrarEventosHoy() },
+      ],
     });
-    this.redibujarRecordatorios();
-  }
-
-  /** PrimeNG no quita un mensaje suelto: se limpia la clave y se vuelven a agregar los vigentes. */
-  private redibujarRecordatorios() {
-    this.messageService.clear(CLAVE_TOAST_RECORDATORIO);
-    if (this.recordatoriosVisibles.size) this.messageService.addAll([...this.recordatoriosVisibles.values()]);
-  }
-
-  alCerrarRecordatorio(mensaje: Message) {
-    this.recordatoriosVisibles.delete(mensaje.data?.id);
-  }
-
-  verCalendarioDesdeRecordatorio(mensaje: Message) {
-    this.recordatoriosVisibles.delete(mensaje.data?.id);
-    this.redibujarRecordatorios();
-    this.mostrarModalCalendario();
   }
 
   /** Cierra la sesión de inmediato, sin confirmación. */

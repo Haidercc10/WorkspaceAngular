@@ -1,0 +1,46 @@
+/* Bajo la barra superior fija */
+:host ::ng-deep .toast-aviso-esquina.p-toast-top-right {
+  top: 5.5rem;
+}
+
+.aviso-esquina {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.aviso-esquina-icono {
+  font-size: 1.75rem;
+}
+
+.aviso-esquina-texto {
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.aviso-esquina-acciones {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+/* Acción principal: relleno rojo del logo, como los demás botones principales */
+:host ::ng-deep .aviso-esquina-principal.p-button {
+  background: var(--rojo);
+  border-color: var(--rojo);
+  color: #fff;
+}
+
+:host ::ng-deep .aviso-esquina-principal.p-button:enabled:hover {
+  background: var(--rojoHover);
+  border-color: var(--rojoHover);
+}
+
+/* El detalle puede traer varias líneas (asunto, autor y comentario de un ticket) */
+.aviso-esquina-texto .p-toast-detail {
+  white-space: pre-line;
+}
